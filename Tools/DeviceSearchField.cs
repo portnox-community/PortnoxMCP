@@ -1,0 +1,56 @@
+namespace PortnoxMCP.Tools
+{
+    /// <summary>
+    /// Enum for all DeviceSearchRequest fields (0-46) as per Portnox API documentation.
+    /// </summary>
+    public enum DeviceSearchField
+    {
+        Id = 0,
+        DeviceId = 1,
+        OrgId = 2,
+        Status = 3,
+        OrgPresence = 4,
+        Account = 5,
+        AccountName_UI = 6,
+        OsName = 7,
+        Risk = 8,
+        GeoInfo = 9,
+        IpAdresses = 10,
+        MacAdresses = 11,
+        Applications = 12,
+        Hotfixes = 13,
+        LoggedUsers = 14,
+        Processes = 15,
+        Browser = 16,
+        Services = 17,
+        Ssid = 18,
+        BrowserExtension = 19,
+        Certificates = 20,
+        GroupName = 21,
+        MacVendor = 22,
+        Manufacturer = 23,
+        Network = 24,
+        Peripheral = 25,
+        CriticalSoftware = 26,
+        RiskScore = 27,
+        Location = 28,
+        FormFactor = 29,
+        NasIp = 30,
+        NasType = 31,
+        NasId = 32,
+        AgentPVersion = 33,
+        PanwThreatName = 34,
+        PanwThreatCategory = 35,
+        AccountType = 36,
+        LastConnected = 37,
+        LastConnectedScore = 38,
+        AuthenticationRepositoryType = 39,
+        Model = 40,
+        AccountContainsDevices = 41,
+        DeviceName = 42,
+        SiteFullPath = 43,
+        LastReportedTime = 44,
+        AccountAlias = 45,
+        GeographyPoint = 46
+    }
+}

@@ -29,23 +29,64 @@ namespace PortnoxMCP.Tools
         => await _getPortnoxMACAccounts.GetMACAccountsAsync(name);
 
     [McpServerTool(Title = "list_devices")]
-    [Description("Retrieves devices from the Portnox API. Supports filtering by deviceId or deviceName.")]
+    [Description("Retrieves devices from the Portnox API. Supports filtering by deviceId or any individual search field.")]
     public async Task<List<object>> ListDevices(
-        IMcpServer server,
-        RequestContext<ModelContextProtocol.Protocol.CallToolRequestParams> context,
-        string? deviceId = null,
+    IMcpServer server,
+    RequestContext<ModelContextProtocol.Protocol.CallToolRequestParams> context,
+    int pageNumber,
+    int pageSize,
+    string? deviceId = null,
+    string? id = null,
+    string? deviceIdField = null,
+        string? orgId = null,
+        string? statusField = null,
+        string? orgPresence = null,
+        string? account = null,
+        string? accountName_UI = null,
+        string? osName = null,
+        string? risk = null,
+        string? geoInfo = null,
+        string? ipAdresses = null,
+        string? macAdresses = null,
+        string? applications = null,
+        string? hotfixes = null,
+        string? loggedUsers = null,
+        string? processes = null,
+        string? browser = null,
+        string? services = null,
+        string? ssid = null,
+        string? browserExtension = null,
+        string? certificates = null,
+        string? groupName = null,
+        string? macVendor = null,
+        string? manufacturer = null,
+        string? network = null,
+        string? peripheral = null,
+        string? criticalSoftware = null,
+        string? riskScore = null,
+        string? location = null,
+        string? formFactor = null,
+        string? nasIp = null,
+        string? nasType = null,
+        string? nasId = null,
+        string? agentPVersion = null,
+        string? panwThreatName = null,
+        string? panwThreatCategory = null,
+        string? accountType = null,
+        string? lastConnected = null,
+        string? lastConnectedScore = null,
+        string? authenticationRepositoryType = null,
+        string? model = null,
+        string? accountContainsDevices = null,
         string? deviceName = null,
-        int pageNumber = 1,
-        int pageSize = 5,
-        string? searchValue = null,
-        int? searchField = null,
+        string? siteFullPath = null,
+        string? lastReportedTime = null,
+        string? accountAlias = null,
+        string? geographyPoint = null,
         int? clientTimeOffset = null,
-        bool? includeAccountWithoutDevices = null,
-        double? startTimeLimit = null,
-        double? endTimeLimit = null,
-        string? startReportedTimeLimit = null,
-        string? endReportedTimeLimit = null)
+    bool? includeAccountWithoutDevices = null
+    )
         => await _getPortnoxDevices.GetDevicesAsync(
-            server, context, deviceId, deviceName, pageNumber, pageSize, searchValue, searchField, clientTimeOffset, includeAccountWithoutDevices, startTimeLimit, endTimeLimit, startReportedTimeLimit, endReportedTimeLimit);
+            server, context, pageNumber, pageSize, deviceId, id, deviceIdField, orgId, statusField, orgPresence, account, accountName_UI, osName, risk, geoInfo, ipAdresses, macAdresses, applications, hotfixes, loggedUsers, processes, browser, services, ssid, browserExtension, certificates, groupName, macVendor, manufacturer, network, peripheral, criticalSoftware, riskScore, location, formFactor, nasIp, nasType, nasId, agentPVersion, panwThreatName, panwThreatCategory, accountType, lastConnected, lastConnectedScore, authenticationRepositoryType, model, accountContainsDevices, deviceName, siteFullPath, lastReportedTime, accountAlias, geographyPoint, clientTimeOffset, includeAccountWithoutDevices);
     }
 }

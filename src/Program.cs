@@ -66,4 +66,4 @@ if (!string.IsNullOrWhiteSpace(portStr) && int.TryParse(portStr, out int parsedP
 {
     port = parsedPort;
 }
-app.Run($"http://0.0.0.0:{port}");
+app.Run($"http://*:{port}");

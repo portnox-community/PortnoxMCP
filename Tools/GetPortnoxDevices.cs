@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text.Json;
+using PortnoxMCP.Tools; // For DeviceSearchField
 
 namespace PortnoxMCP.Tools
 {
@@ -67,29 +68,73 @@ namespace PortnoxMCP.Tools
             Destructive = false
         )]
         [Description("Retrieves devices from the Portnox API. Supports all DeviceQueryRequest and DeviceSearchRequest fields as input. Handles pagination automatically. Accepts pageNumber, pageSize, searchValue, searchField, clientTimeOffset, includeAccountWithoutDevices, time limits, and more.")]
-    public async Task<List<object>> GetDevicesAsync(
-    IMcpServer server,
-    RequestContext<CallToolRequestParams> context,
-    string? deviceId = null,
-    string? deviceName = null,
-    int? pageNumber = null, // Requested page number
-    int? pageSize = null, // Requested page size (1-30)
-    string? searchValue = null, // Value of parameter to search by
-    int? searchField = null, // Searching field (see DeviceSearchRequest enum)
-    int? clientTimeOffset = null, // Timezone offset
-    bool? includeAccountWithoutDevices = null, // By default all accounts are returned. Set to false to return only accounts with at least one device.
-    double? startTimeLimit = null, // Start time limit (double)
-    double? endTimeLimit = null, // End time limit (double)
-    string? startReportedTimeLimit = null, // Start reported time limit (date-time string)
-    string? endReportedTimeLimit = null // End reported time limit (date-time string)
-    )
+    /// <summary>
+    /// Retrieves devices from the Portnox API. Supports all DeviceQueryRequest and DeviceSearchRequest fields as input.
+    /// Handles pagination automatically. Accepts pageNumber, pageSize, searchField (as enum), searchValue, clientTimeOffset, includeAccountWithoutDevices, time limits, and more.
+    /// </summary>
+        public async Task<List<object>> GetDevicesAsync(
+            IMcpServer server,
+            RequestContext<CallToolRequestParams> context,
+            int pageNumber,
+            int pageSize,
+            string? deviceId = null,
+            string? id = null,
+            string? deviceIdField = null,
+            string? orgId = null,
+            string? statusField = null,
+            string? orgPresence = null,
+            string? account = null,
+            string? accountName_UI = null,
+            string? osName = null,
+            string? risk = null,
+            string? geoInfo = null,
+            string? ipAdresses = null,
+            string? macAdresses = null,
+            string? applications = null,
+            string? hotfixes = null,
+            string? loggedUsers = null,
+            string? processes = null,
+            string? browser = null,
+            string? services = null,
+            string? ssid = null,
+            string? browserExtension = null,
+            string? certificates = null,
+            string? groupName = null,
+            string? macVendor = null,
+            string? manufacturer = null,
+            string? network = null,
+            string? peripheral = null,
+            string? criticalSoftware = null,
+            string? riskScore = null,
+            string? location = null,
+            string? formFactor = null,
+            string? nasIp = null,
+            string? nasType = null,
+            string? nasId = null,
+            string? agentPVersion = null,
+            string? panwThreatName = null,
+            string? panwThreatCategory = null,
+            string? accountType = null,
+            string? lastConnected = null,
+            string? lastConnectedScore = null,
+            string? authenticationRepositoryType = null,
+            string? model = null,
+            string? accountContainsDevices = null,
+            string? deviceName = null,
+            string? siteFullPath = null,
+            string? lastReportedTime = null,
+            string? accountAlias = null,
+            string? geographyPoint = null,
+            int? clientTimeOffset = null, // Timezone offset
+            bool? includeAccountWithoutDevices = null // By default all accounts are returned. Set to false to return only accounts with at least one device.
+        )
         {
             // Clamp pageSize to [1, 30] as per API docs
-            int effectivePageSize = pageSize ?? 30;
+            int effectivePageSize = pageSize;
             if (effectivePageSize < 1) effectivePageSize = 1;
             if (effectivePageSize > 30) effectivePageSize = 30;
-            int effectivePageNumber = pageNumber ?? 1;
-            _logger.LogDebug("[GetDevicesAsync] Invoked with deviceId={DeviceId}, deviceName={DeviceName}, pageNumber={PageNumber}, pageSize={PageSize}, searchValue={SearchValue}, searchField={SearchField}", deviceId, deviceName, effectivePageNumber, effectivePageSize, searchValue, searchField);
+            int effectivePageNumber = pageNumber;
+            _logger.LogDebug("[GetDevicesAsync] Invoked with deviceId={DeviceId}, pageNumber={PageNumber}, pageSize={PageSize}", deviceId, effectivePageNumber, effectivePageSize);
             var devices = new List<object>();
             var progressToken = context.Params?.ProgressToken;
             int progress = 0;
@@ -97,33 +142,33 @@ namespace PortnoxMCP.Tools
 
             if (!string.IsNullOrEmpty(deviceId))
             {
-                var path = $"api/device/{deviceId}";
-                var req = new HttpRequestMessage(HttpMethod.Get, new Uri(baseUrl + path));
-                _logger.LogDebug("[GetDevicesAsync] Fetching device by ID: {DeviceId} | Full URL: {FullUrl}", deviceId, req.RequestUri);
-                var resp = await _client.SendAsync(req);
-                var status = (int)resp.StatusCode;
-                var json = await resp.Content.ReadAsStringAsync();
-                _logger.LogDebug("[GetDevicesAsync] Response for deviceId {DeviceId}: Status={Status}, Headers={Headers}, Body={Json}", deviceId, status, resp.Headers, json);
-                if (status != 200)
+                var devicePath = $"api/device/{deviceId}";
+                var deviceReq = new HttpRequestMessage(HttpMethod.Get, new Uri(baseUrl + devicePath));
+                _logger.LogDebug("[GetDevicesAsync] Fetching device by ID: {DeviceId} | Full URL: {FullUrl}", deviceId, deviceReq.RequestUri);
+                var deviceResp = await _client.SendAsync(deviceReq);
+                var deviceStatus = (int)deviceResp.StatusCode;
+                var deviceJson = await deviceResp.Content.ReadAsStringAsync();
+                _logger.LogDebug("[GetDevicesAsync] Response for deviceId {DeviceId}: Status={Status}, Headers={Headers}, Body={Json}", deviceId, deviceStatus, deviceResp.Headers, deviceJson);
+                if (deviceStatus != 200)
                 {
-                    _logger.LogError("[GetDevicesAsync] Non-200 response for deviceId {DeviceId}: {Json}", deviceId, json);
+                    _logger.LogError("[GetDevicesAsync] Non-200 response for deviceId {DeviceId}: {Json}", deviceId, deviceJson);
                     return new List<object>();
                 }
                 // Try to parse as object or array
-                using var doc = JsonDocument.Parse(json);
-                var root = doc.RootElement;
-                if (root.ValueKind == JsonValueKind.Object)
+                using var deviceDoc = JsonDocument.Parse(deviceJson);
+                var deviceRoot = deviceDoc.RootElement;
+                if (deviceRoot.ValueKind == JsonValueKind.Object)
                 {
-                    devices.Add(JsonElementToObject(root));
+                    devices.Add(JsonElementToObject(deviceRoot));
                 }
-                else if (root.ValueKind == JsonValueKind.Array)
+                else if (deviceRoot.ValueKind == JsonValueKind.Array)
                 {
-                    foreach (var entry in root.EnumerateArray())
+                    foreach (var entry in deviceRoot.EnumerateArray())
                         devices.Add(JsonElementToObject(entry));
                 }
                 else
                 {
-                    _logger.LogWarning("[GetDevicesAsync] Unexpected JSON type for deviceId response: {Type}", root.ValueKind);
+                    _logger.LogWarning("[GetDevicesAsync] Unexpected JSON type for deviceId response: {Type}", deviceRoot.ValueKind);
                 }
                 _logger.LogDebug("[GetDevicesAsync] Returning device(s) for ID: {DeviceId}, count: {Count}", deviceId, devices.Count);
                 // Send progress notification for single device fetch
@@ -134,174 +179,118 @@ namespace PortnoxMCP.Tools
                 return devices;
             }
 
-            int pageIdx = 1;
-            bool firstPage = true;
-            int totalPages = 1000; // Arbitrary large number, will be corrected after first page
-            while (true)
+            // Only fetch the requested page once (no auto-pagination)
+            var path = "api/device/list";
+            var queryObj = new Dictionary<string, object?>
             {
-                var path = "api/device/list";
-                // Build DeviceQueryRequest and DeviceSearchRequest objects
-                var queryObj = new Dictionary<string, object?>
-                {
-                    ["PageNumber"] = pageNumber ?? pageIdx,
-                    ["PageSize"] = effectivePageSize
-                };
-                if (clientTimeOffset.HasValue) queryObj["ClientTimeOffset"] = clientTimeOffset.Value;
-                if (includeAccountWithoutDevices.HasValue) queryObj["IncludeAccountWithoutDevices"] = includeAccountWithoutDevices.Value;
-                if (startTimeLimit.HasValue) queryObj["StartTimeLimit"] = startTimeLimit.Value;
-                if (endTimeLimit.HasValue) queryObj["EndTimeLimit"] = endTimeLimit.Value;
-                if (!string.IsNullOrEmpty(startReportedTimeLimit)) queryObj["StartReportedTimeLimit"] = startReportedTimeLimit;
-                if (!string.IsNullOrEmpty(endReportedTimeLimit)) queryObj["EndReportedTimeLimit"] = endReportedTimeLimit;
+                ["PageNumber"] = pageNumber,
+                ["PageSize"] = effectivePageSize
+            };
+            if (clientTimeOffset.HasValue) queryObj["ClientTimeOffset"] = clientTimeOffset.Value;
+            if (includeAccountWithoutDevices.HasValue) queryObj["IncludeAccountWithoutDevices"] = includeAccountWithoutDevices.Value;
+            // time limit parameters removed
 
-                Dictionary<string, object?>? searchObj = null;
-                if (!string.IsNullOrEmpty(deviceName) || !string.IsNullOrEmpty(searchValue) || searchField.HasValue)
-                {
-                    searchObj = new Dictionary<string, object?>();
-                    if (!string.IsNullOrEmpty(deviceName))
-                    {
-                        searchObj["Value"] = deviceName;
-                        searchObj["Field"] = 42; // DeviceName enum
-                    }
-                    else if (!string.IsNullOrEmpty(searchValue) && searchField.HasValue)
-                    {
-                        searchObj["Value"] = searchValue;
-                        searchObj["Field"] = searchField.Value;
-                    }
-                    else if (!string.IsNullOrEmpty(searchValue))
-                    {
-                        searchObj["Value"] = searchValue;
-                    }
-                    else if (searchField.HasValue)
-                    {
-                        searchObj["Field"] = searchField.Value;
-                    }
-                }
+            // Map field names to DeviceSearchField enum values
+            var searchFields = new (string? value, DeviceSearchField field)[]
+            {
+                (id, DeviceSearchField.Id),
+                (deviceIdField, DeviceSearchField.DeviceId),
+                (orgId, DeviceSearchField.OrgId),
+                (statusField, DeviceSearchField.Status),
+                (orgPresence, DeviceSearchField.OrgPresence),
+                (account, DeviceSearchField.Account),
+                (accountName_UI, DeviceSearchField.AccountName_UI),
+                (osName, DeviceSearchField.OsName),
+                (risk, DeviceSearchField.Risk),
+                (geoInfo, DeviceSearchField.GeoInfo),
+                (ipAdresses, DeviceSearchField.IpAdresses),
+                (macAdresses, DeviceSearchField.MacAdresses),
+                (applications, DeviceSearchField.Applications),
+                (hotfixes, DeviceSearchField.Hotfixes),
+                (loggedUsers, DeviceSearchField.LoggedUsers),
+                (processes, DeviceSearchField.Processes),
+                (browser, DeviceSearchField.Browser),
+                (services, DeviceSearchField.Services),
+                (ssid, DeviceSearchField.Ssid),
+                (browserExtension, DeviceSearchField.BrowserExtension),
+                (certificates, DeviceSearchField.Certificates),
+                (groupName, DeviceSearchField.GroupName),
+                (macVendor, DeviceSearchField.MacVendor),
+                (manufacturer, DeviceSearchField.Manufacturer),
+                (network, DeviceSearchField.Network),
+                (peripheral, DeviceSearchField.Peripheral),
+                (criticalSoftware, DeviceSearchField.CriticalSoftware),
+                (riskScore, DeviceSearchField.RiskScore),
+                (location, DeviceSearchField.Location),
+                (formFactor, DeviceSearchField.FormFactor),
+                (nasIp, DeviceSearchField.NasIp),
+                (nasType, DeviceSearchField.NasType),
+                (nasId, DeviceSearchField.NasId),
+                (agentPVersion, DeviceSearchField.AgentPVersion),
+                (panwThreatName, DeviceSearchField.PanwThreatName),
+                (panwThreatCategory, DeviceSearchField.PanwThreatCategory),
+                (accountType, DeviceSearchField.AccountType),
+                (lastConnected, DeviceSearchField.LastConnected),
+                (lastConnectedScore, DeviceSearchField.LastConnectedScore),
+                (authenticationRepositoryType, DeviceSearchField.AuthenticationRepositoryType),
+                (model, DeviceSearchField.Model),
+                (accountContainsDevices, DeviceSearchField.AccountContainsDevices),
+                (deviceName, DeviceSearchField.DeviceName),
+                (siteFullPath, DeviceSearchField.SiteFullPath),
+                (lastReportedTime, DeviceSearchField.LastReportedTime),
+                (accountAlias, DeviceSearchField.AccountAlias),
+                (geographyPoint, DeviceSearchField.GeographyPoint)
+            };
 
-                var bodyDict = new Dictionary<string, object?>
+            Dictionary<string, object?>? searchObj = null;
+            foreach (var (value, field) in searchFields)
+            {
+                if (!string.IsNullOrEmpty(value))
                 {
-                    ["Query"] = queryObj
-                };
-                if (searchObj != null)
-                    bodyDict["Search"] = searchObj;
+                    searchObj = new Dictionary<string, object?>
+                    {
+                        ["Field"] = (int)field,
+                        ["Value"] = value
+                    };
+                    break; // Only use the first non-null field
+                }
+            }
 
-                var req = new HttpRequestMessage(HttpMethod.Post, new Uri(baseUrl + path))
-                {
-                    Content = new StringContent(JsonSerializer.Serialize(bodyDict), System.Text.Encoding.UTF8, "application/json")
-                };
-                _logger.LogDebug("[GetDevicesAsync] Fetching device page {PageIdx} | Full URL: {FullUrl}", pageIdx, req.RequestUri);
-                var resp = await _client.SendAsync(req);
-                var status = (int)resp.StatusCode;
-                var json = await resp.Content.ReadAsStringAsync();
-                if (firstPage)
-                {
-                    _logger.LogInformation("[GetDevicesAsync] RAW JSON response for first page: {Json}", json);
-                    firstPage = false;
-                }
-                _logger.LogDebug("[GetDevicesAsync] Response for page {PageIdx}: Status={Status}, Headers={Headers}, Body={Json}", pageIdx, status, resp.Headers, json);
-                if (status != 200)
-                {
-                    _logger.LogError("[GetDevicesAsync] Non-200 response for page {PageIdx}: {Json}", pageIdx, json);
-                    break;
-                }
-                using var doc = JsonDocument.Parse(json);
-                var root = doc.RootElement;
+            var bodyDict = new Dictionary<string, object?>
+            {
+                ["Query"] = queryObj
+            };
+            if (searchObj != null)
+                bodyDict["Search"] = searchObj;
 
-                // Handle if root is an array of devices
-                if (root.ValueKind == JsonValueKind.Array)
+            var req = new HttpRequestMessage(HttpMethod.Post, new Uri(baseUrl + path))
+            {
+                Content = new StringContent(JsonSerializer.Serialize(bodyDict), System.Text.Encoding.UTF8, "application/json")
+            };
+            _logger.LogDebug("[GetDevicesAsync] Fetching device page {PageNumber} | Full URL: {FullUrl}", pageNumber, req.RequestUri);
+            var resp = await _client.SendAsync(req);
+            var status = (int)resp.StatusCode;
+            var json = await resp.Content.ReadAsStringAsync();
+            _logger.LogInformation("[GetDevicesAsync] RAW JSON response for page {PageNumber}: {Json}", pageNumber, json);
+            _logger.LogDebug("[GetDevicesAsync] Response for page {PageNumber}: Status={Status}, Headers={Headers}, Body={Json}", pageNumber, status, resp.Headers, json);
+            if (status != 200)
+            {
+                _logger.LogError("[GetDevicesAsync] Non-200 response for page {PageNumber}: {Json}", pageNumber, json);
+            }
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            // Extract the "Result" array and add each item to the devices list
+            if (root.TryGetProperty("Result", out var resultElement) && resultElement.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var item in resultElement.EnumerateArray())
                 {
-                    int count = 0;
-                    foreach (var entry in root.EnumerateArray())
-                    {
-                        devices.Add(JsonElementToObject(entry));
-                        count++;
-                        progress++;
-                        if (progressToken is not null)
-                        {
-                            await server.SendNotificationAsync("notifications/progress", new { Progress = progress, Total = totalPages, progressToken });
-                        }
-                    }
-                    _logger.LogInformation("[GetDevicesAsync] Devices extracted from root array: {Count}", count);
-                    break;
+                    devices.Add(JsonElementToObject(item));
                 }
-                // Handle if root is a single device object or a container
-                else if (root.ValueKind == JsonValueKind.Object)
-                {
-                    // Try to find 'Result' property
-                    if (root.TryGetProperty("Result", out var result) && result.ValueKind != JsonValueKind.Null)
-                    {
-                        // If Result is an array (array of objects with Devices array)
-                        if (result.ValueKind == JsonValueKind.Array)
-                        {
-                            int total = 0;
-                            foreach (var resultEntry in result.EnumerateArray())
-                            {
-                                if (resultEntry.ValueKind == JsonValueKind.Object && resultEntry.TryGetProperty("Devices", out var devicesArr) && devicesArr.ValueKind == JsonValueKind.Array)
-                                {
-                                    int count = 0;
-                                    foreach (var device in devicesArr.EnumerateArray())
-                                    {
-                                        devices.Add(JsonElementToObject(device));
-                                        count++;
-                                        total++;
-                                        progress++;
-                                        if (progressToken is not null)
-                                        {
-                                            await server.SendNotificationAsync("notifications/progress", new { Progress = progress, Total = totalPages, progressToken });
-                                        }
-                                    }
-                                    _logger.LogInformation("[GetDevicesAsync] Devices extracted from Result array entry: {Count}", count);
-                                }
-                                else
-                                {
-                                    _logger.LogWarning("[GetDevicesAsync] No 'Devices' array found in Result array entry: {Entry}", resultEntry.ToString());
-                                }
-                            }
-                            _logger.LogInformation("[GetDevicesAsync] Total devices extracted from Result array: {Total}", total);
-                            break;
-                        }
-                        // If Result is an object with 'devices' array
-                        else if (result.ValueKind == JsonValueKind.Object)
-                        {
-                            if (result.TryGetProperty("devices", out var devicesArr) && devicesArr.ValueKind == JsonValueKind.Array)
-                            {
-                                int count = 0;
-                                foreach (var entry in devicesArr.EnumerateArray())
-                                {
-                                    devices.Add(JsonElementToObject(entry));
-                                    count++;
-                                    progress++;
-                                    if (progressToken is not null)
-                                    {
-                                        await server.SendNotificationAsync("notifications/progress", new { Progress = progress, Total = totalPages, progressToken });
-                                    }
-                                }
-                                _logger.LogInformation("[GetDevicesAsync] Devices extracted from Result.devices array: {Count}", count);
-                                pageIdx++;
-                                continue;
-                            }
-                            else
-                            {
-                                _logger.LogWarning("[GetDevicesAsync] 'devices' property is not an array or missing in Result at page {PageIdx}. Value: {Value}", pageIdx, result.ToString());
-                            }
-                        }
-                        else
-                        {
-                            _logger.LogWarning("[GetDevicesAsync] Result property is not an object or array at page {PageIdx}. Value: {Value}", pageIdx, result.ToString());
-                        }
-                    }
-                    else
-                    {
-                        // If no 'Result', treat root as a device object or a container
-                        _logger.LogInformation("[GetDevicesAsync] Root object does not have 'Result'. Treating as device or container.");
-                        devices.Add(JsonElementToObject(root));
-                    }
-                    break;
-                }
-                else
-                {
-                    _logger.LogError("[GetDevicesAsync] Unexpected JSON root element type: {Type}", root.ValueKind);
-                    break;
-                }
+            }
+            else
+            {
+                _logger.LogWarning("[GetDevicesAsync] No 'Result' array found in response JSON.");
             }
 
             _logger.LogInformation("[GetDevicesAsync] Final device list count: {Count}", devices.Count);
@@ -309,7 +298,8 @@ namespace PortnoxMCP.Tools
                 _logger.LogInformation("[GetDevicesAsync] Sample device: {Sample}", JsonSerializer.Serialize(devices[0]));
             else
                 _logger.LogWarning("[GetDevicesAsync] Device list is empty at return.");
+            // Ensure all code paths return a value
             return devices ?? new List<object>();
         }
-    }
-}
+        }
+        }

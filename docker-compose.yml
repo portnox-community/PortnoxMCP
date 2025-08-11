@@ -11,4 +11,5 @@ services:
       - PORTNOX_MAX_RETRIES=3
       - PORTNOX_INITIAL_DELAY_SECONDS=1
       - PORTNOX_HTTP_IDLE_TIMEOUT_SECONDS=-1
+      - MCP_HTTP_PORT=8080
     restart: unless-stopped
