@@ -31,7 +31,7 @@ namespace PortnoxMCP.Tools
             Destructive = false
         )]
         [Description("Retrieves all sites from the Portnox API. Supports filtering by site name.")]
-        public async Task<List<object>> GetSitesAsync(string name = null)
+    public async Task<List<object>> GetSitesAsync(string? name = null)
         {
             _logger.LogDebug("[GetSitesAsync] Invoked with name={Name}", name);
             var req = new HttpRequestMessage(HttpMethod.Get, "/api/nases/sites");
@@ -47,7 +47,7 @@ namespace PortnoxMCP.Tools
             if (!string.IsNullOrEmpty(name))
             {
                 _logger.LogDebug("[GetSitesAsync] Filtering sites by name: {Name}", name);
-                sites = sites.FindAll(s => s.ToString().Contains(name));
+                sites = sites.FindAll(s => s.ToString()!.Contains(name!));
             }
             _logger.LogDebug("[GetSitesAsync] Returning {Count} sites", sites.Count);
             return sites;

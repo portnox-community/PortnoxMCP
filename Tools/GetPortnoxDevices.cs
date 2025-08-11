@@ -75,80 +75,133 @@ namespace PortnoxMCP.Tools
         public async Task<List<object>> GetDevicesAsync(
             IMcpServer server,
             RequestContext<CallToolRequestParams> context,
+            [Description("Page number for pagination (1-based). Determines which page of results to return.")]
             int pageNumber,
+            [Description("Number of devices per page (max 100). Determines the size of each result page.")]
             int pageSize,
+            [Description("Unique device ID to fetch a specific device. If provided, all other filters are ignored.")]
             string? deviceId = null,
+            [Description("Device unique identifier for search filtering.")]
             string? id = null,
+            [Description("Device ID field for search filtering.")]
             string? deviceIdField = null,
+            [Description("Organization ID for filtering devices by organization.")]
             string? orgId = null,
+            [Description("Device status field for search filtering.")]
             string? statusField = null,
+            [Description("Organization presence filter (e.g., present/absent).")]
             string? orgPresence = null,
+            [Description("Account name or ID for filtering devices by account.")]
             string? account = null,
+            [Description("UI display name of the account for filtering.")]
             string? accountName_UI = null,
+            [Description("Operating system name for filtering devices.")]
             string? osName = null,
+            [Description("Device risk level for filtering.")]
             string? risk = null,
+            [Description("Geographical information for device filtering.")]
             string? geoInfo = null,
+            [Description("IP addresses for filtering devices (comma-separated).")]
             string? ipAdresses = null,
+            [Description("MAC addresses for filtering devices (comma-separated).")]
             string? macAdresses = null,
+            [Description("Installed applications for filtering devices.")]
             string? applications = null,
+            [Description("Installed hotfixes for filtering devices.")]
             string? hotfixes = null,
+            [Description("Logged-in users for filtering devices.")]
             string? loggedUsers = null,
+            [Description("Running processes for filtering devices.")]
             string? processes = null,
+            [Description("Browser name/version for filtering devices.")]
             string? browser = null,
+            [Description("Services running on the device for filtering.")]
             string? services = null,
+            [Description("SSID (Wi-Fi network) for filtering devices.")]
             string? ssid = null,
+            [Description("Browser extension for filtering devices.")]
             string? browserExtension = null,
+            [Description("Installed certificates for filtering devices.")]
             string? certificates = null,
+            [Description("Group name for filtering devices.")]
             string? groupName = null,
+            [Description("MAC vendor for filtering devices.")]
             string? macVendor = null,
+            [Description("Device manufacturer for filtering.")]
             string? manufacturer = null,
+            [Description("Network name or ID for filtering devices.")]
             string? network = null,
+            [Description("Peripheral devices for filtering.")]
             string? peripheral = null,
+            [Description("Critical software for filtering devices.")]
             string? criticalSoftware = null,
+            [Description("Device risk score for filtering.")]
             string? riskScore = null,
+            [Description("Device location for filtering.")]
             string? location = null,
+            [Description("Device form factor (e.g., laptop, desktop) for filtering.")]
             string? formFactor = null,
+            [Description("NAS (Network Attached Storage) IP address for filtering.")]
             string? nasIp = null,
+            [Description("NAS type for filtering devices.")]
             string? nasType = null,
+            [Description("NAS ID for filtering devices.")]
             string? nasId = null,
+            [Description("Agent P version for filtering devices.")]
             string? agentPVersion = null,
+            [Description("Palo Alto Networks threat name for filtering devices.")]
             string? panwThreatName = null,
+            [Description("Palo Alto Networks threat category for filtering devices.")]
             string? panwThreatCategory = null,
+            [Description("Account type for filtering devices.")]
             string? accountType = null,
+            [Description("Last connected time for filtering devices.")]
             string? lastConnected = null,
+            [Description("Last connected score for filtering devices.")]
             string? lastConnectedScore = null,
+            [Description("Authentication repository type for filtering devices.")]
             string? authenticationRepositoryType = null,
+            [Description("Device model for filtering.")]
             string? model = null,
+            [Description("Whether the account contains devices (true/false) for filtering.")]
             string? accountContainsDevices = null,
+            [Description("Device name for filtering.")]
             string? deviceName = null,
+            [Description("Full site path for filtering devices.")]
             string? siteFullPath = null,
+            [Description("Last reported time for filtering devices.")]
             string? lastReportedTime = null,
+            [Description("Account alias for filtering devices.")]
             string? accountAlias = null,
+            [Description("Geography point (latitude/longitude) for filtering devices.")]
             string? geographyPoint = null,
-            int? clientTimeOffset = null, // Timezone offset
-            bool? includeAccountWithoutDevices = null // By default all accounts are returned. Set to false to return only accounts with at least one device.
+            [Description("Client timezone offset in minutes (for time-based filtering).")]
+            int? clientTimeOffset = null,
+            [Description("If true, include accounts without devices; if false, only accounts with at least one device are returned.")]
+            bool? includeAccountWithoutDevices = null
         )
         {
-            // Clamp pageSize to [1, 30] as per API docs
             int effectivePageSize = pageSize;
             if (effectivePageSize < 1) effectivePageSize = 1;
-            if (effectivePageSize > 30) effectivePageSize = 30;
+            if (effectivePageSize > 100) effectivePageSize = 100;
             int effectivePageNumber = pageNumber;
-            _logger.LogDebug("[GetDevicesAsync] Invoked with deviceId={DeviceId}, pageNumber={PageNumber}, pageSize={PageSize}", deviceId, effectivePageNumber, effectivePageSize);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("[GetDevicesAsync] Invoked with deviceId={DeviceId}, pageNumber={PageNumber}, pageSize={PageSize}", deviceId, effectivePageNumber, effectivePageSize);
             var devices = new List<object>();
             var progressToken = context.Params?.ProgressToken;
-            int progress = 0;
             var baseUrl = "https://clear.portnox.com:8081/CloudPortalBackEnd/";
 
             if (!string.IsNullOrEmpty(deviceId))
             {
                 var devicePath = $"api/device/{deviceId}";
                 var deviceReq = new HttpRequestMessage(HttpMethod.Get, new Uri(baseUrl + devicePath));
-                _logger.LogDebug("[GetDevicesAsync] Fetching device by ID: {DeviceId} | Full URL: {FullUrl}", deviceId, deviceReq.RequestUri);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug("[GetDevicesAsync] Fetching device by ID: {DeviceId} | Full URL: {FullUrl}", deviceId, deviceReq.RequestUri);
                 var deviceResp = await _client.SendAsync(deviceReq);
                 var deviceStatus = (int)deviceResp.StatusCode;
                 var deviceJson = await deviceResp.Content.ReadAsStringAsync();
-                _logger.LogDebug("[GetDevicesAsync] Response for deviceId {DeviceId}: Status={Status}, Headers={Headers}, Body={Json}", deviceId, deviceStatus, deviceResp.Headers, deviceJson);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug("[GetDevicesAsync] Response for deviceId {DeviceId}: Status={Status}, Headers={Headers}, Body={Json}", deviceId, deviceStatus, deviceResp.Headers, deviceJson);
                 if (deviceStatus != 200)
                 {
                     _logger.LogError("[GetDevicesAsync] Non-200 response for deviceId {DeviceId}: {Json}", deviceId, deviceJson);
@@ -170,7 +223,8 @@ namespace PortnoxMCP.Tools
                 {
                     _logger.LogWarning("[GetDevicesAsync] Unexpected JSON type for deviceId response: {Type}", deviceRoot.ValueKind);
                 }
-                _logger.LogDebug("[GetDevicesAsync] Returning device(s) for ID: {DeviceId}, count: {Count}", deviceId, devices.Count);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug("[GetDevicesAsync] Returning device(s) for ID: {DeviceId}, count: {Count}", deviceId, devices.Count);
                 // Send progress notification for single device fetch
                 if (progressToken is not null)
                 {
@@ -267,12 +321,15 @@ namespace PortnoxMCP.Tools
             {
                 Content = new StringContent(JsonSerializer.Serialize(bodyDict), System.Text.Encoding.UTF8, "application/json")
             };
-            _logger.LogDebug("[GetDevicesAsync] Fetching device page {PageNumber} | Full URL: {FullUrl}", pageNumber, req.RequestUri);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("[GetDevicesAsync] Fetching device page {PageNumber} | Full URL: {FullUrl}", pageNumber, req.RequestUri);
             var resp = await _client.SendAsync(req);
             var status = (int)resp.StatusCode;
             var json = await resp.Content.ReadAsStringAsync();
-            _logger.LogInformation("[GetDevicesAsync] RAW JSON response for page {PageNumber}: {Json}", pageNumber, json);
-            _logger.LogDebug("[GetDevicesAsync] Response for page {PageNumber}: Status={Status}, Headers={Headers}, Body={Json}", pageNumber, status, resp.Headers, json);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("[GetDevicesAsync] RAW JSON response for page {PageNumber}: {Json}", pageNumber, json);
+            if (_logger.IsEnabled(LogLevel.Debug))
+                _logger.LogDebug("[GetDevicesAsync] Response for page {PageNumber}: Status={Status}, Headers={Headers}, Body={Json}", pageNumber, status, resp.Headers, json);
             if (status != 200)
             {
                 _logger.LogError("[GetDevicesAsync] Non-200 response for page {PageNumber}: {Json}", pageNumber, json);
@@ -295,7 +352,10 @@ namespace PortnoxMCP.Tools
 
             _logger.LogInformation("[GetDevicesAsync] Final device list count: {Count}", devices.Count);
             if (devices.Count > 0)
-                _logger.LogInformation("[GetDevicesAsync] Sample device: {Sample}", JsonSerializer.Serialize(devices[0]));
+            {
+                if (_logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug("[GetDevicesAsync] Sample device: {Sample}", JsonSerializer.Serialize(devices[0]));
+            }
             else
                 _logger.LogWarning("[GetDevicesAsync] Device list is empty at return.");
             // Ensure all code paths return a value

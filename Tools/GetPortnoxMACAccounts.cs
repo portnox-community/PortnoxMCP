@@ -31,7 +31,7 @@ namespace PortnoxMCP.Tools
             Destructive = false
         )]
         [Description("Retrieves all MAC-based accounts from the Portnox API. Supports filtering by account name. Handles pagination automatically.")]
-        public async Task<List<object>> GetMACAccountsAsync(string name = null)
+    public async Task<List<object>> GetMACAccountsAsync(string? name = null)
         {
             _logger.LogDebug("[GetMACAccountsAsync] Invoked with name={Name}", name);
             var macAccounts = new List<object>();
@@ -55,7 +55,7 @@ namespace PortnoxMCP.Tools
             if (!string.IsNullOrEmpty(name))
             {
                 _logger.LogDebug("[GetMACAccountsAsync] Filtering MAC accounts by name: {Name}", name);
-                macAccounts = macAccounts.FindAll(a => a.ToString().Contains(name));
+                macAccounts = macAccounts.FindAll(a => a.ToString()!.Contains(name!));
             }
             _logger.LogDebug("[GetMACAccountsAsync] Returning {Count} MAC accounts", macAccounts.Count);
             return macAccounts;

@@ -23,9 +23,6 @@ namespace PortnoxMCP
             _apiKey = (config["PORTNOXAPIKEY"] ?? Environment.GetEnvironmentVariable("PORTNOXAPIKEY") ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(_apiKey))
                 throw new InvalidOperationException("PORTNOXAPIKEY environment variable is not set.");
-            // Log API key length and partial value for debugging (redacted)
-            var redactedKey = _apiKey.Length > 6 ? _apiKey.Substring(0, 3) + "...REDACTED..." + _apiKey.Substring(_apiKey.Length - 3) : "[REDACTED]";
-            _logger.LogInformation("[PortnoxApiClient] Loaded API key: {ApiKey} (length: {Length})", redactedKey, _apiKey.Length);
             // Ensure BaseAddress is set
             if (_httpClient.BaseAddress == null)
                 _httpClient.BaseAddress = new Uri("https://clear.portnox.com:8081/CloudPortalBackEnd/");
@@ -73,8 +70,7 @@ namespace PortnoxMCP
                 try
                 {
                     var response = await _httpClient.SendAsync(request);
-                    if (verbose)
-                        LogRequestAndResponse(request, response);
+                    LogRequestAndResponse(request, response);
 
                     if (response.StatusCode == HttpStatusCode.NotFound)
                     {
@@ -107,8 +103,29 @@ namespace PortnoxMCP
         {
             // Redact sensitive headers
             var headers = request.Headers.ToString().Replace(_apiKey, "[REDACTED]");
-            _logger.LogInformation("HTTP {Method} {Url}\nHeaders: {Headers}\nStatus: {Status}",
-                request.Method, request.RequestUri, headers, response.StatusCode);
+            string? body = null;
+            if (request.Content != null)
+            {
+                // Only log if content is text-based (e.g., JSON, XML, plain text)
+                var contentType = request.Content.Headers.ContentType?.MediaType;
+                if (contentType != null && (contentType.Contains("json") || contentType.Contains("xml") || contentType.Contains("text")))
+                {
+                    try
+                    {
+                        body = request.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    }
+                    catch (Exception ex)
+                    {
+                        body = $"[Error reading body: {ex.Message}]";
+                    }
+                }
+                else if (request.Content.Headers.ContentLength > 0)
+                {
+                    body = "[Non-text content not logged]";
+                }
+            }
+            _logger.LogInformation("HTTP {Method} {Url}\nHeaders: {Headers}\nBody: {Body}\nStatus: {Status}",
+                request.Method, request.RequestUri, headers, body, response.StatusCode);
         }
     }
 }

@@ -10,11 +10,19 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add logging
+// Set log level from LOG_LEVEL env var (DEBUG, INFO, ERROR only)
+var logLevelEnv = builder.Configuration["LOG_LEVEL"] ?? Environment.GetEnvironmentVariable("LOG_LEVEL") ?? "INFO";
+LogLevel minLogLevel = logLevelEnv.ToUpper() switch
+{
+    "DEBUG" => LogLevel.Debug,
+    "ERROR" => LogLevel.Error,
+    _ => LogLevel.Information
+};
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-
-
+builder.Logging.SetMinimumLevel(minLogLevel);
+builder.Logging.AddFilter("Microsoft.AspNetCore.DataProtection", LogLevel.Error);
 
 // Configure HTTPTransport idle timeout from environment variable (seconds)
 var idleTimeoutStr = builder.Configuration["MCP_HTTP_IDLE_TIMEOUT_SECONDS"] ?? Environment.GetEnvironmentVariable("MCP_HTTP_IDLE_TIMEOUT_SECONDS");
@@ -26,8 +34,6 @@ if (!string.IsNullOrWhiteSpace(idleTimeoutStr) && int.TryParse(idleTimeoutStr, o
 
 // Register IHttpContextAccessor for tools/services that need HTTP context
 builder.Services.AddHttpContextAccessor();
-
-
 
 // Register all tool dependencies for DI
 builder.Services.AddTransient<GetPortnoxSite>();
@@ -53,8 +59,6 @@ builder.Services.AddHttpClient<PortnoxApiClient>(client =>
 
 
 var app = builder.Build();
-
-
 // Map both / and /mcp to the MCP protocol handler
 app.MapMcp("");    // root /
 app.MapMcp("/mcp"); // /mcp
