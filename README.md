@@ -1,7 +1,21 @@
 
+
 # 🚦 PortnoxMCP
 
 PortnoxMCP is a .NET-based project that bridges the Portnox Clear API with the Model Context Protocol (MCP) ecosystem. It enables secure, scalable, and maintainable integration of Portnox Clear with LLMs and other MCP-compliant tools.
+
+## 📑 Table of Contents
+
+- [✨ Features](#-features)
+- [⚡ Quick Start](#-quick-start)
+- [🧰 Tools](#-tools)
+- [📚 Documentation](#-documentation)
+- [🏗️ Architecture & Best Practices](#-architecture--best-practices)
+- [🌐 Remote Portnox MCP Server](#-remote-portnox-mcp-server)
+- [🔌 Server Port Configuration](#-server-port-configuration)
+- [⚙️ Environment Variables](#️-environment-variables)
+- [🧑‍💻 Local Development: Build & Run with Docker](#-local-development-build--run-with-docker)
+- [🤝 Community & Support](#-community--support)
 
 
 ## ✨ Features
@@ -14,6 +28,26 @@ PortnoxMCP is a .NET-based project that bridges the Portnox Clear API with the M
 ## ⚡ Quick Start
 See [`Checklist.md`](Checklist.md) and [`FOUNDATION.md`](FOUNDATION.md) for setup and requirements.
 
+
+
+## 🧰 Tools
+
+The following MCP tools are currently implemented and available:
+
+- **GetPortnoxDevices**
+	- Retrieves devices from the Portnox API.
+	- Supports filtering by device ID, device name, and advanced query/search parameters.
+	- Handles pagination and progress notifications.
+
+- **GetPortnoxSite**
+	- Retrieves site information from the Portnox API.
+	- Supports filtering by site name or ID.
+
+- **GetPortnoxMACAccounts**
+	- Retrieves MAC-based accounts from the Portnox API.
+	- Supports filtering by account name.
+
+> For full details on tool parameters and usage, see [`docs/usage_examples.md`](docs/usage_examples.md) and the API documentation.
 
 ## 📚 Documentation
 - [`FOUNDATION.md`](FOUNDATION.md) — Project foundation, architecture, and rationale
