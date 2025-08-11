@@ -1,0 +1,23 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Docker
+*.tar
+*.log
+.env
+
+# VSCode
+.vscode/
+
+# Others
+.DS_Store
+Thumbs.db
+Checklist.md
+FOUNDATION.md
+PortnoxMCP.sln
+.editorconfig

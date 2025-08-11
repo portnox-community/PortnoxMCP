@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  portnoxmcp:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - PORTNOX_MAX_RETRIES=3
+      - PORTNOX_INITIAL_DELAY_SECONDS=1
+      - PORTNOX_HTTP_IDLE_TIMEOUT_SECONDS=-1
+    restart: unless-stopped
