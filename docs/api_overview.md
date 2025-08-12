@@ -11,36 +11,13 @@ PortnoxMCP exposes Portnox Clear API operations as Model Context Protocol (MCP) 
 	```
 
 ## 🌐 Endpoint Structure
-- MCP tools are exposed as HTTP endpoints under `/mcp/tools/<ToolName>/<MethodName>`.
-- Example: `POST /mcp/tools/GetPortnoxDevices/GetDevicesAsync`
-- All requests and responses use JSON.
+PortnoxMCP exposes the following HTTP endpoints for its tools:
 
-### Example Request
-```http
-POST /mcp/tools/GetPortnoxDevices/GetDevicesAsync HTTP/1.1
-Host: your-portnox-mcp-server.example.com
-Authorization: Bearer <your-portnox-api-key>
-Content-Type: application/json
+- `/mcp/tools/GetPortnoxDevices/GetDevicesAsync` — Retrieve devices from the Portnox API
+- `/mcp/tools/GetPortnoxSite/GetSiteAsync` — Retrieve site information from the Portnox API
+- `/mcp/tools/GetPortnoxMACAccounts/GetMACAccountsAsync` — Retrieve MAC-based accounts from the Portnox API
 
-{
-	"deviceId": "12345",
-	"pageNumber": 1,
-	"pageSize": 10
-}
-```
-
-### Example Response
-```json
-[
-	{
-		"DeviceId": "12345",
-		"DeviceName": "Workstation-01",
-		"Status": "Active",
-		...
-	},
-	...
-]
-```
+All endpoints use the POST method and accept JSON request bodies. Replace `<ToolName>` and `<MethodName>` as shown above for each tool.
 
 ## 🔒 Security
 - All HTTP requests enforce TLS 1.2+ for secure communication.
@@ -72,9 +49,3 @@ Content-Type: application/json
 ## 🏷️ Versioning
 - The API follows [Semantic Versioning](https://semver.org/).
 - All changes and releases are documented in `CHANGELOG.md`.
-
-## 📚 Further Reading
-- See [`FOUNDATION.md`](../FOUNDATION.md) for requirements and architecture.
-- See [`Checklist.md`](../Checklist.md) for project status and setup.
-- See [`usage_examples.md`](usage_examples.md) for more example requests and responses.
-- See [`secrets_management.md`](secrets_management.md) for secure API key handling.

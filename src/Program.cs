@@ -53,7 +53,7 @@ builder.Services
 // Register PortnoxApiClient for DI so MCP tools can be constructed
 builder.Services.AddHttpClient<PortnoxApiClient>(client =>
 {
-    client.BaseAddress = new Uri("https://clear.portnox.com:8081/CloudPortalBackEnd");
+    client.BaseAddress = new Uri("https://clear.portnox.com:8081/CloudPortalBackEnd/");
     client.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("portnox-mcp", "1.0"));
 });
 

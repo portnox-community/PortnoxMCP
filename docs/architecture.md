@@ -44,7 +44,6 @@ PortnoxMCP bridges the Portnox Clear API with the Model Context Protocol (MCP) u
 - Register new tools in the server startup configuration.
 - Follow the established folder and class structure for consistency.
 
+
 ## 📚 Related Documentation
-- See [`FOUNDATION.md`](../FOUNDATION.md) for requirements and rationale.
-- See [`Checklist.md`](../Checklist.md) for project progress.
-- See [`api_overview.md`](api_overview.md) for endpoint and usage details.
+See [`api_overview.md`](api_overview.md) for endpoint and usage details.

@@ -14,15 +14,6 @@ PortnoxMCP uses centralized, structured logging to aid in monitoring, debugging,
 ## 📝 Log Output
 - Logs are output to the console by default; can be extended to files or external systems (e.g., Seq, ELK, Azure Monitor).
 - Log entries are structured (JSON or plain text) and include timestamps, log level, and message.
-- Example log entry:
-	```json
-	{
-		"Timestamp": "2025-08-10T12:34:56Z",
-		"Level": "Information",
-		"Message": "User login succeeded.",
-		"SourceContext": "PortnoxMCP.Tools.GetPortnoxDevices"
-	}
-	```
 
 ## 🎚️ Log Levels
 - Supported levels: Trace, Debug, Information, Warning, Error, Critical.

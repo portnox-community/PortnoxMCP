@@ -12,11 +12,9 @@ PortnoxMCP is a .NET-based project that bridges the Portnox Clear API with the M
 - [📚 Documentation](#-documentation)
 - [🏗️ Architecture & Best Practices](#-architecture--best-practices)
 - [🌐 Remote Portnox MCP Server](#-remote-portnox-mcp-server)
-- [🔌 Server Port Configuration](#-server-port-configuration)
 - [⚙️ Environment Variables](#️-environment-variables)
 - [🧑‍💻 Local Development: Build & Run with Docker](#-local-development-build--run-with-docker)
 - [🤝 Community & Support](#-community--support)
-
 
 ## ✨ Features
 - 🛠️ Exposes Portnox Clear API operations as MCP tools
@@ -25,10 +23,25 @@ PortnoxMCP is a .NET-based project that bridges the Portnox Clear API with the M
 - 🧩 Extensible and maintainable architecture
 
 
+## 📝 TODO / Upcoming Features
+- **Client Side or Server Side Auth Support**
+- **Audit logging:** Track all API and tool invocations for compliance and troubleshooting.
+- **Advanced filtering and search:**
+	- More flexible query options for devices, sites, and accounts.
+	- Document and improve device list filter options:
+		- **Default Enabled:** `IntuneDeviceData`
+		- **Default Disabled:** `MdmEnrollmentInfo`, `ExtendedOSInfo`, `MobileGsmSettings`, `MobilePhoneNumber`, `MobileWifiSettings`, `OrganizationPresence`, `OsVersion`, `ProfilingData`, `Status`
+	- Intent-based calls: Look up device owner via `$Data.IntuneDeviceData.DeviceOwners`
+	- Single device lookup: Filter out `Credentials` completely
+	- Known broken filters (Portnox side): `AccountNameUI`
+- **Bulk operations:** Support for batch device/account updates and actions.
+- **Enhanced error reporting:** More detailed error messages and troubleshooting guidance.
+
+_Have a feature request? Open an issue or contribute!_
+
+
 ## ⚡ Quick Start
 See [`Checklist.md`](Checklist.md) and [`FOUNDATION.md`](FOUNDATION.md) for setup and requirements.
-
-
 
 ## 🧰 Tools
 
@@ -48,12 +61,6 @@ The following MCP tools are currently implemented and available:
 	- Supports filtering by account name.
 
 > For full details on tool parameters and usage, see [`docs/usage_examples.md`](docs/usage_examples.md) and the API documentation.
-
-## 📚 Documentation
-- [`FOUNDATION.md`](FOUNDATION.md) — Project foundation, architecture, and rationale
-- [`Checklist.md`](Checklist.md) — Setup, tasks, and project status
-- [`docs/`](docs/) — API, architecture, CI/CD, logging, monitoring, and more
-
 
 
 ## 🏗️ Architecture & Best Practices
@@ -102,31 +109,7 @@ To connect your MCP host to a remote Portnox MCP Server, add a configuration blo
 
 ---
 
-
-## 🔌 Server Port Configuration
-
-The server port is configurable via the `MCP_HTTP_PORT` environment variable. By default, the server listens on port 8080. You can override this by setting the variable:
-
-```powershell
-$env:MCP_HTTP_PORT=5000
-dotnet run --project src/
-```
-
-
-Or in a `.env` file:
-
-```
-MCP_HTTP_PORT=5000
-```
-
-This is implemented in code as:
-
-```csharp
-var portStr = builder.Configuration["MCP_HTTP_PORT"] ?? Environment.GetEnvironmentVariable("MCP_HTTP_PORT");
-```
-
-
-If the port is already in use, set `MCP_HTTP_PORT` to a free port and update your client configuration accordingly.
+## Visual Studio Code MCP Configuration
 
 ```json
 {
@@ -151,7 +134,7 @@ If the port is already in use, set `MCP_HTTP_PORT` to a free port and update you
 ```
 
 
-> **ℹ️ Note:** The actual configuration syntax may vary depending on your MCP host. Refer to your host's documentation for details.
+> **ℹ️ Note:** The actual configuration syntax may vary depending on your MCP host. Refer to your IDE documentation for details.
 
 
 ### 🔒 Security
@@ -176,12 +159,11 @@ The following environment variables can be set to configure PortnoxMCP:
 | ASPNETCORE_ENVIRONMENT           | .NET environment (Development/Production)                        | Development |
 | PORTNOX_MAX_RETRIES              | Max retries for 429 (Too Many Requests) responses                | 3       |
 | PORTNOX_INITIAL_DELAY_SECONDS    | Initial delay (in seconds) before retrying 429 responses         | 1       |
+| MCP_HTTP_PORT                    | Port for the MCP HTTP server.                                    | 8080    |
 | MCP_HTTP_IDLE_TIMEOUT_SECONDS    | Idle timeout (in seconds) for HTTPTransport (MCP server). Use -1 for infinite. | -1 (infinite) |
 
 
 Set these in your `.env` file or as environment variables in your deployment.
-
-
 
 ## 🧑‍💻 Local Development: Build & Run with Docker
 

@@ -20,7 +20,7 @@ namespace PortnoxMCP.Tools
 
     [McpServerTool(Title = "list_sites")]
     [Description("Retrieves all sites from the Portnox API. Supports filtering by site name.")]
-    public async Task<List<object>> ListSites(string? name = null)
+    public async Task<List<GetPortnoxSite.SiteInfo>> ListSites(string? name = null)
         => await _getPortnoxSite.GetSitesAsync(name);
 
     [McpServerTool(Title = "list_mac_accounts")]
