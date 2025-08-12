@@ -1,8 +1,51 @@
 
 
-# 🚦 PortnoxMCP
 
-PortnoxMCP is a .NET-based project that bridges the Portnox Clear API with the Model Context Protocol (MCP) ecosystem. It enables secure, scalable, and maintainable integration of Portnox Clear with LLMs and other MCP-compliant tools.
+<p align="center">
+	<img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/mcp.png" alt="MCP Logo" width="120" />
+</p>
+
+<p align="center">
+	<img src="https://img.shields.io/badge/.NET-8.0-blueviolet?logo=dotnet" alt=".NET 8.0" height="20"/>
+	<img src="https://img.shields.io/badge/Docker-ready-blue?logo=docker" alt="Docker" height="20"/>
+</p>
+
+<p align="center">
+	<a href="https://github.com/CalebBartleMAA/PortnoxMCP/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/CalebBartleMAA/PortnoxMCP/ci.yml?branch=main&label=CI" alt="Build Status"></a>
+	<a href="https://github.com/CalebBartleMAA/PortnoxMCP/blob/main/LICENSE"><img src="https://img.shields.io/github/license/CalebBartleMAA/PortnoxMCP.svg" alt="License"></a>
+	<a href="https://github.com/CalebBartleMAA/PortnoxMCP/releases"><img src="https://img.shields.io/github/v/release/CalebBartleMAA/PortnoxMCP?include_prereleases&label=release" alt="Release"></a>
+	<a href="https://github.com/CalebBartleMAA/PortnoxMCP/issues"><img src="https://img.shields.io/github/issues/CalebBartleMAA/PortnoxMCP.svg" alt="Issues"></a>
+</p>
+<p align="center">
+	<a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat" alt="Contributions welcome"></a>
+	<a href="SECURITY.md"><img src="https://img.shields.io/badge/security-policy-important.svg?color=orange" alt="Security Policy"></a>
+	<img src="https://img.shields.io/badge/status-beta-blueviolet" alt="Project Status: Beta" />
+</p>
+</p>
+
+<p align="center">
+	<b>Open source Portnox MCP Server for LLMs with Portnox CLEAR</b>
+</p>
+
+<p align="center">
+	<a href="#features">Features</a> •
+	<a href="#quick-start">Quick Start</a> •
+	<a href="#tools">Tools</a> •
+	<a href="#documentation">Docs</a> •
+	<a href="#architecture--best-practices">Architecture</a> •
+	<a href="#remote-portnox-mcp-server">Remote Server</a> •
+	<a href="#environment-variables">Env Vars</a> •
+	<a href="#local-development-build--run-with-docker">Docker</a> •
+	<a href="#community--support">Community</a> •
+	<a href="https://github.com/CalebBartleMAA/PortnoxMCP/issues">Issues</a> •
+	<a href="https://portnox.com/">Portnox.com</a>
+</p>
+
+# Portnox MCP Server
+
+Portnox MCP Server is an open source, community driven .NET-based project that bridges the Portnox Clear API with the Model Context Protocol (MCP) ecosystem. It enables secure, scalable, and maintainable integration of Portnox Clear with LLMs and other MCP-compliant tools.
+
+> **Disclaimer:** This project is not affiliated with, endorsed by, or supported by Portnox™. For official Portnox products, support, and documentation, please visit [portnox.com](https://portnox.com/) and [docs.portnox.com](https://docs.portnox.com/).
 
 ## 📑 Table of Contents
 
